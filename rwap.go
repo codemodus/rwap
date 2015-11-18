@@ -19,10 +19,6 @@ func (w *ResponseWriter) Write(p []byte) (int, error) {
 }
 
 func (w *ResponseWriter) WriteHeader(status int) {
-	if w.status != 0 {
-		return
-	}
-
 	w.status = status
 	w.ResponseWriter.WriteHeader(status)
 }

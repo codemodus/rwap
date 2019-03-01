@@ -55,3 +55,9 @@ func Wrap(next http.Handler) http.Handler {
 		next.ServeHTTP(New(w), r)
 	})
 }
+
+// AsRwap ...
+func AsRwap(w http.ResponseWriter) (*Rwap, bool) {
+	rw, ok := w.(*Rwap)
+	return rw, ok
+}

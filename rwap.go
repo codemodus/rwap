@@ -5,29 +5,38 @@ import (
 	"strconv"
 )
 
-type ResponseWriter struct {
+// Rwap ...
+type Rwap struct {
 	http.ResponseWriter
 	status        int
 	contentLength int64
 }
 
-func (w *ResponseWriter) Write(p []byte) (int, error) {
+// New ...
+func New(w http.ResponseWriter) *Rwap {
+	return &Rwap{ResponseWriter: w}
+}
+
+func (w *Rwap) Write(p []byte) (int, error) {
 	cl, err := w.ResponseWriter.Write(p)
 	w.contentLength += int64(cl)
 
 	return cl, err
 }
 
-func (w *ResponseWriter) WriteHeader(status int) {
+// WriteHeader ...
+func (w *Rwap) WriteHeader(status int) {
 	w.status = status
 	w.ResponseWriter.WriteHeader(status)
 }
 
-func (w *ResponseWriter) Status() int {
+// Status ...
+func (w *Rwap) Status() int {
 	return w.status
 }
 
-func (w *ResponseWriter) ContentLength() int64 {
+// ContentLength ...
+func (w *Rwap) ContentLength() int64 {
 	if w.contentLength > 0 {
 		return w.contentLength
 	}
@@ -40,9 +49,9 @@ func (w *ResponseWriter) ContentLength() int64 {
 	return cl
 }
 
+// Wrap ...
 func Wrap(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		nw := &ResponseWriter{ResponseWriter: w}
-		next.ServeHTTP(nw, r)
+		next.ServeHTTP(New(w), r)
 	})
 }
